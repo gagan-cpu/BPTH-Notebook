@@ -1,0 +1,560 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>बुद्धा टेन्ट हाउस - सामान नोटबुक</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #172033;
+}
+
+header {
+  background: linear-gradient(135deg, #102a43, #176b87);
+  color: white;
+  text-align: center;
+  padding: 24px 12px;
+}
+
+header h1 { margin: 0 0 8px; }
+header p { margin: 0; }
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 14px;
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  margin-bottom: 15px;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px #0000000d;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin: 10px 0 5px;
+}
+
+input, select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+button {
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #176b87;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 4px 2px;
+}
+
+button.danger { background: #c62828; }
+button.green { background: #18864b; }
+button.gray { background: #475569; }
+
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px;
+}
+
+th, td {
+  border: 1px solid #e2e8f0;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #e8f3f7;
+}
+
+td input {
+  min-width: 65px;
+  width: 75px;
+  padding: 8px;
+  text-align: center;
+}
+
+.summary {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  flex: 1;
+  min-width: 110px;
+  background: #e8f3f7;
+  padding: 13px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.stat strong {
+  display: block;
+  font-size: 23px;
+  margin-top: 6px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+@media print {
+  body { background: white; }
+  header { background: white; color: black; }
+  .no-print, button { display: none !important; }
+  .container { max-width: none; padding: 0; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+  table { min-width: 0; font-size: 11px; }
+  td input {
+    border: 0;
+    width: 45px;
+    min-width: 0;
+    padding: 0;
+  }
+  input { color: black; }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>बुद्धा टेन्ट हाउस</h1>
+  <p>सामान नोटबुक एवं स्टेटमेंट मैनेजमेंट</p>
+</header>
+
+<div class="container">
+
+  <section class="card">
+    <h2>📋 कार्यक्रम की जानकारी</h2>
+
+    <label>ग्राहक / पार्टी का नाम</label>
+    <input id="customer" placeholder="जैसे: राम प्रसाद">
+
+    <label>मोबाइल नंबर</label>
+    <input id="phone" type="tel" placeholder="मोबाइल नंबर">
+
+    <label>कार्यक्रम का नाम / स्थान</label>
+    <input id="event" placeholder="जैसे: शादी, जन्मदिन, गाँव">
+
+    <label>सामान देने की तारीख</label>
+    <input id="date" type="date">
+
+    <label>स्टेटमेंट का नाम</label>
+    <input id="statementName" placeholder="जैसे: राम प्रसाद शादी">
+
+    <div class="actions no-print">
+      <button onclick="newStatement()">नया स्टेटमेंट</button>
+      <button class="green" onclick="saveStatement()">💾 स्टेटमेंट सेव करें</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📦 सामान की लिस्ट</h2>
+
+    <div class="summary">
+      <div class="stat">कुल सामान के प्रकार
+        <strong id="totalItems">0</strong>
+      </div>
+      <div class="stat">दिया गया कुल पीस
+        <strong id="totalGiven">0</strong>
+      </div>
+      <div class="stat">वापस बाकी पीस
+        <strong id="totalPending">0</strong>
+      </div>
+    </div>
+
+    <br>
+
+    <div class="table-wrap">
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th>क्र.</th>
+            <th>सामान का नाम</th>
+            <th>दिया (पीस)</th>
+            <th>वापस आया</th>
+            <th>बाकी</th>
+            <th class="no-print">हटाएँ</th>
+          </tr>
+        </thead>
+        <tbody id="itemRows"></tbody>
+      </table>
+    </div>
+
+    <div class="actions no-print">
+      <button onclick="addItem()">➕ Add Item</button>
+      <button class="green" onclick="saveStatement()">💾 सेव करें</button>
+    </div>
+
+    <label>अतिरिक्त नोट</label>
+    <input id="notes" placeholder="कोई जरूरी बात लिखें">
+  </section>
+
+  <section class="card no-print">
+    <h2>📥 स्टेटमेंट डाउनलोड करें</h2>
+    <p>अपना स्टेटमेंट मोबाइल में सेव करने के लिए नीचे विकल्प चुनें।</p>
+
+    <button class="green" onclick="downloadCSV()">
+      Excel / CSV डाउनलोड
+    </button>
+
+    <button onclick="window.print()">
+      PDF / प्रिंट सेव करें
+    </button>
+  </section>
+
+  <section class="card no-print">
+    <h2>📚 पुराने स्टेटमेंट</h2>
+
+    <select id="savedList">
+      <option value="">स्टेटमेंट चुनें</option>
+    </select>
+
+    <div class="actions">
+      <button onclick="loadStatement()">खोलें</button>
+      <button class="danger" onclick="deleteStatement()">डिलीट</button>
+    </div>
+
+    <p style="font-size:13px;color:#64748b">
+      नोट: सेव किए गए स्टेटमेंट इसी ब्राउज़र में रहते हैं।
+      ब्राउज़र का डेटा मिटाने पर वे हट सकते हैं।
+    </p>
+  </section>
+
+</div>
+
+<script>
+const defaultItems = [
+  "डेग",
+  "कढ़ाही",
+  "करछुल",
+  "करछा",
+  "पंजा",
+  "जग",
+  "बाल्टी",
+  "गैस चूल्हा",
+  "गैस सिलेंडर",
+  "कुर्सी",
+  "टेबल",
+  "चारपाई",
+  "टेंट",
+  "माड़ो",
+  "बिस्तरा",
+  "पराठा"
+];
+
+let items = [];
+let currentId = null;
+
+function makeId() {
+  return Date.now().toString(36) +
+         Math.random().toString(36).slice(2, 7);
+}
+
+function addItem(name = "", given = 0, returned = 0) {
+  items.push({
+    id: makeId(),
+    name,
+    given,
+    returned
+  });
+
+  renderItems();
+}
+
+function renderItems() {
+  const tbody = document.getElementById("itemRows");
+  tbody.innerHTML = "";
+
+  items.forEach((item, index) => {
+    const tr = document.createElement("tr");
+
+    const values = [
+      index + 1,
+      item.name,
+      item.given,
+      item.returned,
+      Math.max(0, Number(item.given) - Number(item.returned))
+    ];
+
+    values.forEach((value, col) => {
+      const td = document.createElement("td");
+
+      if (col === 1) {
+        const input = document.createElement("input");
+        input.value = value;
+        input.placeholder = "सामान का नाम";
+        input.setAttribute("aria-label", "सामान का नाम");
+
+        input.oninput = () => {
+          item.name = input.value;
+        };
+
+        td.appendChild(input);
+
+      } else if (col === 2 || col === 3) {
+        const input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.step = "1";
+        input.value = value;
+        input.setAttribute("aria-label",
+          col === 2 ? "दिया गया पीस" : "वापस आया पीस");
+
+        input.oninput = () => {
+          item[col === 2 ? "given" : "returned"] =
+            Math.max(0, Number(input.value) || 0);
+          renderItems();
+        };
+
+        td.appendChild(input);
+
+      } else {
+        td.textContent = value;
+      }
+
+      tr.appendChild(td);
+    });
+
+    const action = document.createElement("td");
+    action.className = "no-print";
+
+    const btn = document.createElement("button");
+    btn.textContent = "❌";
+    btn.className = "danger";
+    btn.onclick = () => {
+      items = items.filter(x => x.id !== item.id);
+      renderItems();
+    };
+
+    action.appendChild(btn);
+    tr.appendChild(action);
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("totalItems").textContent = items.length;
+
+  document.getElementById("totalGiven").textContent =
+    items.reduce((sum, x) => sum + Number(x.given || 0), 0);
+
+  document.getElementById("totalPending").textContent =
+    items.reduce((sum, x) =>
+      sum + Math.max(0, Number(x.given || 0) -
+                         Number(x.returned || 0)), 0);
+}
+
+function getFormData() {
+  return {
+    id: currentId || makeId(),
+    name: document.getElementById("statementName").value.trim()
+          || "बिना नाम का स्टेटमेंट",
+    customer: document.getElementById("customer").value,
+    phone: document.getElementById("phone").value,
+    event: document.getElementById("event").value,
+    date: document.getElementById("date").value,
+    notes: document.getElementById("notes").value,
+    items: items
+  };
+}
+
+function saveStatement() {
+  const data = getFormData();
+  currentId = data.id;
+
+  let all = JSON.parse(
+    localStorage.getItem("buddhaStatements") || "[]"
+  );
+
+  const index = all.findIndex(x => x.id === data.id);
+
+  if (index >= 0) {
+    all[index] = data;
+  } else {
+    all.push(data);
+  }
+
+  localStorage.setItem("buddhaStatements", JSON.stringify(all));
+  refreshSavedList();
+
+  alert("स्टेटमेंट सफलतापूर्वक सेव हो गया!");
+}
+
+function refreshSavedList() {
+  const select = document.getElementById("savedList");
+  const previous = select.value;
+
+  select.innerHTML = '<option value="">स्टेटमेंट चुनें</option>';
+
+  const all = JSON.parse(
+    localStorage.getItem("buddhaStatements") || "[]"
+  );
+
+  all.forEach(s => {
+    const option = document.createElement("option");
+    option.value = s.id;
+    option.textContent =
+      s.name + (s.date ? " — " + s.date : "");
+    select.appendChild(option);
+  });
+
+  if (all.some(s => s.id === previous)) {
+    select.value = previous;
+  } else if (currentId) {
+    select.value = currentId;
+  }
+}
+
+function loadStatement() {
+  const id = document.getElementById("savedList").value;
+  if (!id) return alert("पहले स्टेटमेंट चुनें।");
+
+  const all = JSON.parse(
+    localStorage.getItem("buddhaStatements") || "[]"
+  );
+
+  const s = all.find(x => x.id === id);
+  if (!s) return alert("स्टेटमेंट नहीं मिला।");
+
+  currentId = s.id;
+
+  document.getElementById("statementName").value = s.name;
+  document.getElementById("customer").value = s.customer || "";
+  document.getElementById("phone").value = s.phone || "";
+  document.getElementById("event").value = s.event || "";
+  document.getElementById("date").value = s.date || "";
+  document.getElementById("notes").value = s.notes || "";
+
+  items = (s.items || []).map(x => ({
+    id: makeId(),
+    name: x.name,
+    given: Number(x.given) || 0,
+    returned: Number(x.returned) || 0
+  }));
+
+  renderItems();
+}
+
+function deleteStatement() {
+  const id = document.getElementById("savedList").value;
+  if (!id) return alert("पहले स्टेटमेंट चुनें।");
+
+  if (!confirm("क्या आप यह स्टेटमेंट डिलीट करना चाहते हैं?")) {
+    return;
+  }
+
+  let all = JSON.parse(
+    localStorage.getItem("buddhaStatements") || "[]"
+  );
+
+  all = all.filter(s => s.id !== id);
+  localStorage.setItem("buddhaStatements", JSON.stringify(all));
+
+  if (currentId === id) newStatement();
+
+  refreshSavedList();
+  alert("स्टेटमेंट डिलीट हो गया।");
+}
+
+function newStatement() {
+  currentId = null;
+
+  document.getElementById("statementName").value = "";
+  document.getElementById("customer").value = "";
+  document.getElementById("phone").value = "";
+  document.getElementById("event").value = "";
+  document.getElementById("date").value =
+    new Date().toISOString().slice(0, 10);
+  document.getElementById("notes").value = "";
+
+  items = defaultItems.map(name => ({
+    id: makeId(),
+    name,
+    given: 0,
+    returned: 0
+  }));
+
+  renderItems();
+}
+
+function downloadCSV() {
+  const s = getFormData();
+
+  const rows = [
+    ["बुद्धा टेन्ट हाउस"],
+    ["स्टेटमेंट", s.name],
+    ["ग्राहक", s.customer],
+    ["मोबाइल", s.phone],
+    ["कार्यक्रम / स्थान", s.event],
+    ["तारीख", s.date],
+    [],
+    ["क्र.", "सामान", "दिया गया", "वापस आया", "बाकी"]
+  ];
+
+  s.items.forEach((item, i) => {
+    rows.push([
+      i + 1,
+      item.name,
+      item.given,
+      item.returned,
+      Math.max(0, Number(item.given) - Number(item.returned))
+    ]);
+  });
+
+  rows.push([]);
+  rows.push(["नोट", s.notes]);
+
+  const csv = "\uFEFF" + rows.map(row =>
+    row.map(cell =>
+      '"' + String(cell ?? "").replace(/"/g, '""') + '"'
+    ).join(",")
+  ).join("\r\n");
+
+  const blob = new Blob([csv], {
+    type: "text/csv;charset=utf-8;"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = (s.name || "tent-house-statement")
+    .replace(/[\\/:*?"<>|]/g, "_") + ".csv";
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+newStatement();
+refreshSavedList();
+</script>
+
+</body>
+</html>
